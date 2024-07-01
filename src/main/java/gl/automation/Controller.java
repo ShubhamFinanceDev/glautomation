@@ -44,8 +44,8 @@ public class Controller {
 
     }
     @GetMapping("/create")
-    public String createFile() throws IOException
+    public void createFile() throws IOException
     {
-       return glService.generateFile();
+        glService.invokeProcessOfGl();
     }
 }
