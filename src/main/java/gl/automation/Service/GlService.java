@@ -36,23 +36,24 @@ public class GlService {
     @Autowired
     private CalendarUtility calendar;
 
-    @Scheduled(cron = "*/5 * * * * *")
+    @Scheduled(cron = "2 * * * * *")
     public void invokeProcessOfGl() {
         try {
-            logger.info("Gl Process start");
-            if (calendar.currentDate().isAfter(calendar.dateBasedOnDay(4))) {
+            LocalDate currentDate=calendar.currentDate();
+            logger.info("Gl Process start {}",currentDate);
+            if ((currentDate.isAfter(calendar.dateBasedOnDay(4)) && (currentDate.isBefore(calendar.lastDateOfCurrentMonth())))) {
                 LocalDate processDate = calendar.glProcessDate(1);
-                logger.info("Gl Process invoke for " + processDate);
-                glJobInvoke(processDate);
+                logger.info("Gl Process invoke for {}",processDate);
+                glJobInvoke(processDate,"scheduler");
 
             } else if (calendar.currentDate().equals(calendar.dateBasedOnDay(4))) {
                 for (int i = 1; i <= 4; i++) {
                     LocalDate processDate = calendar.glProcessDate(i);
-                    glJobInvoke(processDate);
+                    glJobInvoke(processDate,"scheduler");
 
                 }
             } else {
-                logger.info("Current date does not match with given criteria.");
+                logger.info("Current date is less then of 4th day month or equal to last day of month.");
             }
 
         } catch (Exception e) {
@@ -62,8 +63,8 @@ public class GlService {
     }
 
 
-    public void glJobInvoke(LocalDate processDate) throws IOException {
-        logger.info("Gl Process invoked for " + processDate +" at "+Calendar.getInstance().getTime());
+    public void glJobInvoke(LocalDate processDate, String invokedBy) throws IOException {
+        logger.info("Process invoked for {}" , processDate +" at "+Calendar.getInstance().getTime()+ "By "+invokedBy);
         String fileName = "Gl-" + processDate + ".xlsx";
         generateFile(fileName);  //generateFileLocally
         uploadFileIntoStorage(fileName);
@@ -95,7 +96,7 @@ public class GlService {
         } finally {
             workbook.close();
         }
-        logger.info("File have been created");
+        logger.info("File have been created {}");
     }
 
 

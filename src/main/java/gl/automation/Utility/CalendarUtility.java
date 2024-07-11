@@ -12,27 +12,25 @@ import java.util.Date;
 public class CalendarUtility {
     int year=2024;
     int month=06;
-    int day=04;
+    int day=30;
 
-
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     public LocalDate currentDate() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year,month,day);
         Date currentDate = calendar.getTime();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = dateFormat.format(currentDate);
         System.out.println(formattedDate);
         LocalDate date = LocalDate.parse(formattedDate);
         return date;
     }
 
-    public LocalDate glProcessDate(int day) {
+    public LocalDate glProcessDate(int prevDay) {
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(year,month,day);
-        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        calendar.add(Calendar.DAY_OF_MONTH, -prevDay);
         Date currentDate = calendar.getTime();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = dateFormat.format(currentDate);
         System.out.println(currentDate+"process date"+ formattedDate);
         LocalDate date = LocalDate.parse(formattedDate);
@@ -44,7 +42,18 @@ public class CalendarUtility {
         calendar.set(year,month,day);
         calendar.set(Calendar.DAY_OF_MONTH, day);
         Date currentDate = calendar.getTime();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = dateFormat.format(currentDate);
+        LocalDate date = LocalDate.parse(formattedDate);
+        return date;
+    }
+
+    public LocalDate lastDateOfCurrentMonth()
+    {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year,month,day);
+        calendar.set(Calendar.DAY_OF_MONTH,calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        Date currentDate = calendar.getTime();
         String formattedDate = dateFormat.format(currentDate);
         LocalDate date = LocalDate.parse(formattedDate);
         return date;
