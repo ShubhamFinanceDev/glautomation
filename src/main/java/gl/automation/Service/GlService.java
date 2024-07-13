@@ -1,6 +1,7 @@
 package gl.automation.Service;
 
 import gl.automation.Configuration.BlobStorageService;
+import gl.automation.Dto.ReportModel;
 import gl.automation.Utility.CalendarUtility;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -9,6 +10,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -23,8 +28,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @EnableScheduling
 @Service
@@ -35,58 +42,113 @@ public class GlService {
     private BlobStorageService blobStorageService;
     @Autowired
     private CalendarUtility calendar;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-    @Scheduled(cron = "2 * * * * *")
+    //    @Scheduled(cron = "")
     public void invokeProcessOfGl() {
         try {
-            LocalDate currentDate=calendar.currentDate();
-            logger.info("Gl Process start {}",currentDate);
-            if ((currentDate.isAfter(calendar.dateBasedOnDay(4)) && (currentDate.isBefore(calendar.lastDateOfCurrentMonth())))) {
+            LocalDate currentDate = calendar.currentDate();
+            logger.info("Gl Process start {}", currentDate);
+
+            if (currentDate.isAfter(calendar.dateBasedOnDay(4))) {
                 LocalDate processDate = calendar.glProcessDate(1);
-                logger.info("Gl Process invoke for {}",processDate);
-                glJobInvoke(processDate,"scheduler");
-
-            } else if (calendar.currentDate().equals(calendar.dateBasedOnDay(4))) {
+                logger.info("Gl Process invoke for {}", processDate);
+                glJobInvoke(processDate, "scheduler");
+            } else if (currentDate.equals(calendar.dateBasedOnDay(4))) {
                 for (int i = 1; i <= 4; i++) {
-                    LocalDate processDate = calendar.glProcessDate(i);
-                    glJobInvoke(processDate,"scheduler");
-
+                    glJobInvoke(calendar.glProcessDate(i), "scheduler");
                 }
             } else {
-                logger.info("Current date is less then of 4th day month or equal to last day of month.");
+                logger.info("Current date is less than 4th day of month or equal to last day of month.");
             }
-
         } catch (Exception e) {
-            logger.error("Error while invoking Gl process", e.getMessage());
+            logger.error("Error while invoking Gl process: {}", e.getMessage());
         }
-        logger.info("Gl process completed. "+Calendar.getInstance().getTime());
+        logger.info("Gl process completed. {}", Calendar.getInstance().getTime());
     }
 
 
-    public void glJobInvoke(LocalDate processDate, String invokedBy) throws IOException {
-        logger.info("Process invoked for {}" , processDate +" at "+Calendar.getInstance().getTime()+ "By "+invokedBy);
+
+
+    public ResponseEntity<?> glJobInvoke(LocalDate processDate, String invokedBy) throws IOException {
+        logger.info("Process invoked for {}", processDate + " at " + Calendar.getInstance().getTime() + " By " + invokedBy);
         String fileName = "Gl-" + processDate + ".xlsx";
-        generateFile(fileName);  //generateFileLocally
-        uploadFileIntoStorage(fileName);
+        try {
+
+            List<ReportModel> reportModels = new ArrayList<>();
+            readData(processDate, reportModels);
+            if(reportModels.size()>0){
+                generateFile(fileName,reportModels);  //generateFileLocally
+                uploadFileIntoStorage(fileName);
+            }
+            else {
+                logger.info("Data is not available to write in file");
+            }
+        }
+        catch (Exception e)
+        {
+            logger.error("Error while invoking gl Job by invokedBy{}",invokedBy,e.getMessage());
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return ResponseEntity.ok("Success");
+    }
+
+    private void readData(LocalDate processDate,List<ReportModel> reportModels) throws Exception{
+        String query="SELECT *\n" +
+                "FROM neo_cas_lms_sit1_sh.gl_handsoff_view_new_prod1_pan\n" +
+                "WHERE ROWNUM <= 10\n" +
+                "AND \"Voucher_Date\" = TO_DATE("+processDate+", 'DD-MM-YYYY');";
+
+        reportModels= jdbcTemplate.query(query, new BeanPropertyRowMapper<>(ReportModel.class));
+        logger.info("Read no of rows {}",reportModels.size());
     }
 
 
-
-
-
-
-    public void generateFile(String fileName) throws IOException {
+    public void generateFile(String fileName,List<ReportModel> reportModels) throws IOException {
 
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("MIS_Report");
         int rowCount = 0;
-        String[] header = {"ApplicationNumber", "BranchName", "ApplicantName", "ChequeAmount", "ConsumerType", "HandoverDate", "LoanAmount", "UpdatedBy"};
+        String[] header = {"VOUCHER_DTL_ID","Voucher_Number","Branch","GL_Code","DrCr_Flag","Amount","NARRATION","Reference_Id","Loan_Id","Value_Date","Voucher_Date","Voucher_Creation_Date","Product_Code","Entity_ID","SCHEME_CODE","CUST_ID","CUST_NAME","PRODUCT_TYPE","PRODUCT_NAME","SANCTIONED_LOAN_AMOUNT","CAS_APPLICATION_NUMBERt","CHEQUE_NUMBER","LOAN_BRANCH_STATE_CODE","CUSTOMER_ADDRESS_STATE_CODE","PAN"};
         Row headerRow = sheet.createRow(rowCount++);
         int cellCount = 0;
 
         for (String headerValue : header) {
             headerRow.createCell(cellCount++).setCellValue(headerValue);
         }
+        for(ReportModel readData: reportModels)
+        {
+            Row row = sheet.createRow(rowCount++);
+            cellCount = 0;
+            row.createCell(cellCount++).setCellValue(readData.getVoucherDtlId());
+            row.createCell(cellCount++).setCellValue(readData.getVoucherNumber());
+            row.createCell(cellCount++).setCellValue(readData.getBranch());
+            row.createCell(cellCount++).setCellValue(readData.getGlCode());
+            row.createCell(cellCount++).setCellValue(readData.getDrCrFlag());
+            row.createCell(cellCount++).setCellValue(readData.getAmount());
+            row.createCell(cellCount++).setCellValue(readData.getNarration());
+            row.createCell(cellCount++).setCellValue(readData.getReferenceId());
+            row.createCell(cellCount++).setCellValue(readData.getLoanId());
+            row.createCell(cellCount++).setCellValue(readData.getValueDate());
+            row.createCell(cellCount++).setCellValue(readData.getVoucherDate());
+            row.createCell(cellCount++).setCellValue(readData.getVoucherCreationDate());
+            row.createCell(cellCount++).setCellValue(readData.getProductCode());
+            row.createCell(cellCount++).setCellValue(readData.getEntityId());
+            row.createCell(cellCount++).setCellValue(readData.getSchemeCode());
+            row.createCell(cellCount++).setCellValue(readData.getCustId());
+            row.createCell(cellCount++).setCellValue(readData.getCustName());
+            row.createCell(cellCount++).setCellValue(readData.getProductType());
+            row.createCell(cellCount++).setCellValue(readData.getProductName());
+            row.createCell(cellCount++).setCellValue(readData.getSanctionLoanAmount());
+            row.createCell(cellCount++).setCellValue(readData.getCasApplicationNumber());
+            row.createCell(cellCount++).setCellValue(readData.getChequeNumber());
+            row.createCell(cellCount++).setCellValue(readData.getLoanBranchStateCode());
+            row.createCell(cellCount++).setCellValue(readData.getCustomerAddressStateCode());
+            row.createCell(cellCount++).setCellValue(readData.getPan());
+
+        }
+
         try {
             Path filePath = Paths.get("src/main/resources", fileName);
             Files.createDirectories(filePath.getParent());

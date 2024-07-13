@@ -18,6 +18,7 @@ public class ReportModel {
     private String voucherCreationDate;
     private String productCode;
     private String entityId;
+    private String schemeCode;
     private String custId;
     private String custName;
     private String productType;
@@ -28,4 +29,5 @@ public class ReportModel {
     private String loanBranchStateCode;
     private String customerAddressStateCode;
     private String pan;
+
 }
