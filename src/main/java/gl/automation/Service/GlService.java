@@ -45,7 +45,7 @@ public class GlService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    //    @Scheduled(cron = "")
+    @Scheduled(cron = "2 * * * * *")
     public void invokeProcessOfGl() {
         try {
             LocalDate currentDate = calendar.currentDate();
@@ -159,7 +159,7 @@ public class GlService {
         } finally {
             workbook.close();
         }
-        logger.info("File have been created {}");
+        logger.info("File have been created");
     }
 
 
