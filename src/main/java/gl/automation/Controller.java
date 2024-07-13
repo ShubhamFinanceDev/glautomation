@@ -23,16 +23,10 @@ public class Controller {
     private BlobStorageService blobStorageService;
 
     @PostMapping("/invoke-gl-job")
-    public ResponseEntity<String> createAndUploadGl(@RequestBody Map<String,String> request)  {
-        try {
+    public ResponseEntity<?> createAndUploadGl(@RequestBody Map<String,String> request) throws IOException {
             String invokedBy = request.get("invokedBy");
             LocalDate processDate = LocalDate.parse(request.get("gl-date"));
-            glService.glJobInvoke(processDate, invokedBy);
-        }
-        catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return ResponseEntity.ok("Success");
+        return glService.glJobInvoke(processDate, invokedBy);
     }
 
     @GetMapping("/download")

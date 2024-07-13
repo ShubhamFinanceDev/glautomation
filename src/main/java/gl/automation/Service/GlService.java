@@ -74,11 +74,11 @@ public class GlService {
     public ResponseEntity<?> glJobInvoke(LocalDate processDate, String invokedBy) throws IOException {
         logger.info("Process invoked for {}", processDate + " at " + Calendar.getInstance().getTime() + " By " + invokedBy);
         String fileName = "Gl-" + processDate + ".xlsx";
+        List<ReportModel> reportModels = new ArrayList<>();
         try {
 
-            List<ReportModel> reportModels = new ArrayList<>();
-            readData(processDate, reportModels);
-            if(reportModels.size()>0){
+            reportModels= readData(processDate);
+            if(!reportModels.isEmpty()){
                 generateFile(fileName,reportModels);  //generateFileLocally
                 uploadFileIntoStorage(fileName);
             }
@@ -88,21 +88,22 @@ public class GlService {
         }
         catch (Exception e)
         {
-            logger.error("Error while invoking gl Job by invokedBy{}",invokedBy,e.getMessage());
+            logger.error("Error while invoking gl Job by invokedBy {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return ResponseEntity.ok("Success");
     }
 
-    private void readData(LocalDate processDate,List<ReportModel> reportModels) throws Exception{
+
+
+    private List<ReportModel> readData(LocalDate processDate) throws Exception{
         String query="SELECT *\n" +
                 "FROM neo_cas_lms_sit1_sh.gl_handsoff_view_new_prod1_pan\n" +
                 "WHERE ROWNUM <= 10\n" +
-                "AND \"Voucher_Date\" = TO_DATE("+processDate+", 'DD-MM-YYYY');";
+                "AND \"Voucher_Date\" = TO_DATE('"+processDate+"', 'YYYY-MM-DD')";
 
-        reportModels= jdbcTemplate.query(query, new BeanPropertyRowMapper<>(ReportModel.class));
-        logger.info("Read no of rows {}",reportModels.size());
-    }
+        return jdbcTemplate.query(query, new BeanPropertyRowMapper<>(ReportModel.class));
+        }
 
 
     public void generateFile(String fileName,List<ReportModel> reportModels) throws IOException {
