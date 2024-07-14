@@ -46,7 +46,7 @@ public class GlService {
     private JdbcTemplate jdbcTemplate;
 
     @Scheduled(cron = "2 * * * * *")
-    public void invokeProcessOfGl() {
+    public void invokeProcessBySchedule() {
         try {
             LocalDate currentDate = calendar.currentDate();
             logger.info("Gl Process start {}", currentDate);
@@ -56,11 +56,13 @@ public class GlService {
                 logger.info("Gl Process invoke for {}", processDate);
                 glJobInvoke(processDate, "scheduler");
             } else if (currentDate.equals(calendar.dateBasedOnDay(4))) {
-                for (int i = 1; i <= 4; i++) {
+                int i=1;
+                while(i<=4) {
                     glJobInvoke(calendar.glProcessDate(i), "scheduler");
+                    i++;
                 }
             } else {
-                logger.info("Current date is less than 4th day of month or equal to last day of month.");
+                logger.info("Current date is less than 4th day of month");
             }
         } catch (Exception e) {
             logger.error("Error while invoking Gl process: {}", e.getMessage());
@@ -83,7 +85,7 @@ public class GlService {
                 uploadFileIntoStorage(fileName);
             }
             else {
-                logger.info("Data is not available to write in file");
+                logger.info("Records not available to write in file");
             }
         }
         catch (Exception e)
@@ -149,6 +151,7 @@ public class GlService {
             row.createCell(cellCount++).setCellValue(readData.getPan());
 
         }
+        logger.info("No of records insert in file "+rowCount);
 
         try {
             Path filePath = Paths.get("src/main/resources", fileName);
