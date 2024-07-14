@@ -46,7 +46,7 @@ public class GlService {
     private JdbcTemplate jdbcTemplate;
 
     @Scheduled(cron = "2 * * * * *")
-    public void invokeProcessBySchedule() {
+    public void invokeScheduler() {
         try {
             LocalDate currentDate = calendar.currentDate();
             logger.info("Gl Process start {}", currentDate);
@@ -101,8 +101,8 @@ public class GlService {
     private List<ReportModel> readData(LocalDate processDate) throws Exception{
         String query="SELECT *\n" +
                 "FROM neo_cas_lms_sit1_sh.gl_handsoff_view_new_prod1_pan\n" +
-                "WHERE ROWNUM <= 10\n" +
-                "AND \"Voucher_Date\" = TO_DATE('"+processDate+"', 'YYYY-MM-DD')";
+                "WHERE \n" +
+                "\"Voucher_Date\" = TO_DATE('"+processDate+"', 'YYYY-MM-DD')";
 
         return jdbcTemplate.query(query, new BeanPropertyRowMapper<>(ReportModel.class));
         }
@@ -175,9 +175,9 @@ public class GlService {
         if (files != null) {
             for (File file : files) {
                 if (file.getName().equals(fileName)) {
-                    System.out.println("uploaded successfully " + file.getName());
-//                    InputStream inputStream = new FileInputStream(file);
+                    InputStream inputStream = new FileInputStream(file);
 //                    blobStorageService.uploadBlob("ilfsblob", fileName, inputStream, file.length());
+                    System.out.println("uploaded successfully " + file.getName());
 
                 }
             }
