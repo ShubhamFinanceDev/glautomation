@@ -32,7 +32,7 @@ public class Controller {
     @GetMapping("/download")
     public ResponseEntity<ByteArrayResource> downloadFile() throws IOException {
 
-        String blobName = "GL2024.06.24.xlsx";
+        String blobName = "Gl-2016-05-28.xlsx";
         byte[] data = blobStorageService.downloadBlob("ilfsblob", blobName);
         ByteArrayResource resource = new ByteArrayResource(data);
 
@@ -46,6 +46,6 @@ public class Controller {
     @GetMapping("/create")
     public void createFile() throws IOException
     {
-        glService.invokeProcessOfGl();
+//        glService.invokeProcessOfGl();
     }
 }
