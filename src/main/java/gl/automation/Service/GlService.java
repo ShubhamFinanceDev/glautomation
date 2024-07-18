@@ -53,8 +53,8 @@ public class GlService {
                 logger.info("Gl Process invoke for {}", processDate);
                 glJobInvoke(processDate, "scheduler");
             } else if (currentDate.equals(calendar.dateBasedOnDay(4))) {
-                int i=1;
-                while(i<=4) {
+                int i = 1;
+                while (i <= 4) {
                     glJobInvoke(calendar.glProcessDate(i), "scheduler");
                     i++;
                 }
@@ -68,8 +68,6 @@ public class GlService {
     }
 
 
-
-
     public ResponseEntity<?> glJobInvoke(LocalDate processDate, String invokedBy) throws IOException {
         logger.info("Process invoked for {}", processDate + " at " + Calendar.getInstance().getTime() + " By " + invokedBy);
         String fileName = "Gl-" + processDate + ".xlsx";
@@ -78,47 +76,43 @@ public class GlService {
 
             reportModels= readData(processDate);
             if(!reportModels.isEmpty()){
-               byte[] file=generateFile(fileName,reportModels);  //generateFileLocally
-                uploadFileIntoStorage(fileName,file);
+            byte[] file = generateFile(fileName, reportModels);  //generateFileLocally
+            uploadFileIntoStorage(fileName, file);
             }
             else {
                 logger.info("Records not available to write in file");
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.error("Error while invoking gl Job by invokedBy {}", e.getMessage());
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return ResponseEntity.ok("Success");
     }
 
 
-
-    private List<ReportModel> readData(LocalDate processDate) throws Exception{
-        String query="SELECT *\n" +
+    private List<ReportModel> readData(LocalDate processDate) throws Exception {
+        String query = "SELECT *\n" +
                 "FROM neo_cas_lms_sit1_sh.gl_handsoff_view_new_prod1_pan\n" +
                 "WHERE ROWNUM <= 10\n" +
-                "AND \"Voucher_Date\" = TO_DATE('"+processDate+"', 'YYYY-MM-DD')";
+                "AND \"Voucher_Date\" = TO_DATE('" + processDate + "', 'YYYY-MM-DD')";
 
         return jdbcTemplate.query(query, new BeanPropertyRowMapper<>(ReportModel.class));
-        }
+    }
 
 
-    public byte[] generateFile(String fileName,List<ReportModel> reportModels) throws IOException {
+    public byte[] generateFile(String fileName, List<ReportModel> reportModels) throws IOException {
 
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("MIS_Report");
         int rowCount = 0;
-        String[] header = {"VOUCHER_DTL_ID","Voucher_Number","Branch","GL_Code","DrCr_Flag","Amount","NARRATION","Reference_Id","Loan_Id","Value_Date","Voucher_Date","Voucher_Creation_Date","Product_Code","Entity_ID","SCHEME_CODE","CUST_ID","CUST_NAME","PRODUCT_TYPE","PRODUCT_NAME","SANCTIONED_LOAN_AMOUNT","CAS_APPLICATION_NUMBERt","CHEQUE_NUMBER","LOAN_BRANCH_STATE_CODE","CUSTOMER_ADDRESS_STATE_CODE","PAN"};
+        String[] header = {"VOUCHER_DTL_ID", "Voucher_Number", "Branch", "GL_Code", "DrCr_Flag", "Amount", "NARRATION", "Reference_Id", "Loan_Id", "Value_Date", "Voucher_Date", "Voucher_Creation_Date", "Product_Code", "Entity_ID", "SCHEME_CODE", "CUST_ID", "CUST_NAME", "PRODUCT_TYPE", "PRODUCT_NAME", "SANCTIONED_LOAN_AMOUNT", "CAS_APPLICATION_NUMBERt", "CHEQUE_NUMBER", "LOAN_BRANCH_STATE_CODE", "CUSTOMER_ADDRESS_STATE_CODE", "PAN"};
         Row headerRow = sheet.createRow(rowCount++);
         int cellCount = 0;
 
         for (String headerValue : header) {
             headerRow.createCell(cellCount++).setCellValue(headerValue);
         }
-        for(ReportModel readData: reportModels)
-        {
+        for (ReportModel readData : reportModels) {
             Row row = sheet.createRow(rowCount++);
             cellCount = 0;
             row.createCell(cellCount++).setCellValue(readData.getVoucherDtlId());
@@ -148,13 +142,13 @@ public class GlService {
             row.createCell(cellCount++).setCellValue(readData.getPan());
 
         }
-        logger.info("No of records insert in file "+rowCount);
+        logger.info("No of records insert in file " + rowCount);
         byte[] excelData;
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);
             workbook.close();
-             excelData = outputStream.toByteArray();
+            excelData = outputStream.toByteArray();
         } finally {
             workbook.close();
         }
@@ -163,24 +157,11 @@ public class GlService {
     }
 
 
-    void uploadFileIntoStorage(String fileName,byte[] file) throws IOException {
-//        String folderPath = "src/main/resources/";
-//
-//        File folder = new File(folderPath);
-//
-//        File[] files = folder.listFiles();
-//        if (files != null) {
-//            for (File file : files) {
-//                if (file.getName().equals(fileName)) {
-//                    System.out.println("uploaded successfully " + file.getName());
-                    InputStream inputStream = new FileInputStream(Arrays.toString(file));
-                    blobStorageService.uploadBlob("ilfsblob", fileName, inputStream, file.length);
-//
-//                }
-//            }
-//        } else {
-//            System.out.println("No files found in the directory.");
-//        }
+    void uploadFileIntoStorage(String fileName, byte[] file) throws IOException {
+
+        InputStream inputStream = new ByteArrayInputStream(file);
+        blobStorageService.uploadBlob("ilfsblob", fileName, inputStream, file.length);
+        logger.info("File uploaded: " + fileName);
 
 
     }
