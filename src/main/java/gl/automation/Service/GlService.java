@@ -28,10 +28,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @EnableScheduling
 @Service
@@ -81,8 +78,8 @@ public class GlService {
 
             reportModels= readData(processDate);
             if(!reportModels.isEmpty()){
-                generateFile(fileName,reportModels);  //generateFileLocally
-                uploadFileIntoStorage(fileName);
+               byte[] file=generateFile(fileName,reportModels);  //generateFileLocally
+                uploadFileIntoStorage(fileName,file);
             }
             else {
                 logger.info("Records not available to write in file");
@@ -108,7 +105,7 @@ public class GlService {
         }
 
 
-    public void generateFile(String fileName,List<ReportModel> reportModels) throws IOException {
+    public byte[] generateFile(String fileName,List<ReportModel> reportModels) throws IOException {
 
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("MIS_Report");
@@ -152,38 +149,39 @@ public class GlService {
 
         }
         logger.info("No of records insert in file "+rowCount);
-
+        byte[] excelData;
         try {
-            Path filePath = Paths.get("src/main/resources", fileName);
-            Files.createDirectories(filePath.getParent());
-
-            FileOutputStream fileOut = new FileOutputStream(filePath.toString());
-            workbook.write(fileOut);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            workbook.close();
+             excelData = outputStream.toByteArray();
         } finally {
             workbook.close();
         }
         logger.info("File have been created");
+        return excelData;
     }
 
 
-    void uploadFileIntoStorage(String fileName) throws IOException {
-        String folderPath = "src/main/resources/";
+    void uploadFileIntoStorage(String fileName,byte[] file) throws IOException {
+//        String folderPath = "src/main/resources/";
+//
+//        File folder = new File(folderPath);
+//
+//        File[] files = folder.listFiles();
+//        if (files != null) {
+//            for (File file : files) {
+//                if (file.getName().equals(fileName)) {
+//                    System.out.println("uploaded successfully " + file.getName());
+                    InputStream inputStream = new FileInputStream(Arrays.toString(file));
+                    blobStorageService.uploadBlob("ilfsblob", fileName, inputStream, file.length);
+//
+//                }
+//            }
+//        } else {
+//            System.out.println("No files found in the directory.");
+//        }
 
-        File folder = new File(folderPath);
-
-        File[] files = folder.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.getName().equals(fileName)) {
-                    System.out.println("uploaded successfully " + file.getName());
-//                    InputStream inputStream = new FileInputStream(file);
-//                    blobStorageService.uploadBlob("ilfsblob", fileName, inputStream, file.length());
-
-                }
-            }
-        } else {
-            System.out.println("No files found in the directory.");
-        }
 
     }
 
