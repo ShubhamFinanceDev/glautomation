@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @EnableScheduling
@@ -42,7 +43,7 @@ public class GlService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Scheduled(cron = "2 * * * * *")
+    @Scheduled(cron = "0 0/1 * * * *")
     public void invokeProcessBySchedule() {
         try {
             LocalDate currentDate = calendar.currentDate();
@@ -70,7 +71,10 @@ public class GlService {
 
     public ResponseEntity<?> glJobInvoke(LocalDate processDate, String invokedBy) throws IOException {
         logger.info("Process invoked for {}", processDate + " at " + Calendar.getInstance().getTime() + " By " + invokedBy);
-        String fileName = "Gl-" + processDate + ".xlsx";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMMYYYY");
+        String formattedDate = processDate.format(formatter);
+
+        String fileName = "Handsoff " + formattedDate + ".xlsx";
         List<ReportModel> reportModels = new ArrayList<>();
         try {
 
@@ -93,8 +97,7 @@ public class GlService {
     private List<ReportModel> readData(LocalDate processDate) throws Exception {
         String query = "SELECT *\n" +
                 "FROM neo_cas_lms_sit1_sh.gl_handsoff_view_new_prod1_pan\n" +
-                "WHERE ROWNUM <= 10\n" +
-                "AND \"Voucher_Date\" = TO_DATE('" + processDate + "', 'YYYY-MM-DD')";
+                "WHERE \"Voucher_Date\" = TO_DATE('" + processDate + "', 'YYYY-MM-DD')";
 
         return jdbcTemplate.query(query, new BeanPropertyRowMapper<>(ReportModel.class));
     }
@@ -142,7 +145,7 @@ public class GlService {
             row.createCell(cellCount++).setCellValue(readData.getPan());
 
         }
-        logger.info("No of records insert in file " + rowCount);
+        logger.info("No of records insert in file {}", rowCount);
         byte[] excelData;
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -161,7 +164,7 @@ public class GlService {
 
         InputStream inputStream = new ByteArrayInputStream(file);
         blobStorageService.uploadBlob("ilfsblob", fileName, inputStream, file.length);
-        logger.info("File uploaded: " + fileName);
+        logger.info("File uploaded: {}", fileName);
 
 
     }

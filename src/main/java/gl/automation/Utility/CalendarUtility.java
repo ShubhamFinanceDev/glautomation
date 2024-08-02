@@ -21,8 +21,7 @@ public class CalendarUtility {
         Date currentDate = calendar.getTime();
         String formattedDate = dateFormat.format(currentDate);
         System.out.println(formattedDate);
-        LocalDate date = LocalDate.parse(formattedDate);
-        return date;
+        return LocalDate.parse(formattedDate);
     }
 
     public LocalDate glProcessDate(int prevDay) {
@@ -33,8 +32,7 @@ public class CalendarUtility {
         Date currentDate = calendar.getTime();
         String formattedDate = dateFormat.format(currentDate);
         System.out.println(currentDate+"process date"+ formattedDate);
-        LocalDate date = LocalDate.parse(formattedDate);
-        return date;
+        return LocalDate.parse(formattedDate);
     }
 
     public LocalDate dateBasedOnDay(int day) {
@@ -43,8 +41,7 @@ public class CalendarUtility {
         calendar.set(Calendar.DAY_OF_MONTH, day);
         Date currentDate = calendar.getTime();
         String formattedDate = dateFormat.format(currentDate);
-        LocalDate date = LocalDate.parse(formattedDate);
-        return date;
+        return LocalDate.parse(formattedDate);
     }
 
     public LocalDate lastDateOfCurrentMonth()
@@ -55,7 +52,6 @@ public class CalendarUtility {
         calendar.set(Calendar.DAY_OF_MONTH,calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
         Date currentDate = calendar.getTime();
         String formattedDate = dateFormat.format(currentDate);
-        LocalDate date = LocalDate.parse(formattedDate);
-        return date;
+        return LocalDate.parse(formattedDate);
     }
 }
