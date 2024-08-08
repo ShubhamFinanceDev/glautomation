@@ -43,7 +43,7 @@ public class GlService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-//    @Scheduled(cron = "0 0/1 * * * *")
+    @Scheduled(cron = "0 0 10 * * *")
     public void invokeProcessBySchedule() {
         try {
             LocalDate currentDate = calendar.currentDate();

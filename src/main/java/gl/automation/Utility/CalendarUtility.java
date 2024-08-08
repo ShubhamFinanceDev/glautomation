@@ -17,7 +17,7 @@ public class CalendarUtility {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     public LocalDate currentDate() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year,month,day);
+//        calendar.set(year,month,day);
         Date currentDate = calendar.getTime();
         String formattedDate = dateFormat.format(currentDate);
         System.out.println(formattedDate);
@@ -27,7 +27,7 @@ public class CalendarUtility {
     public LocalDate glProcessDate(int prevDay) {
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year,month,day);
+//        calendar.set(year,month,day);
         calendar.add(Calendar.DAY_OF_MONTH, -prevDay);
         Date currentDate = calendar.getTime();
         String formattedDate = dateFormat.format(currentDate);
@@ -37,21 +37,11 @@ public class CalendarUtility {
 
     public LocalDate dateBasedOnDay(int day) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year,month,day);
+//        calendar.set(year,month,day);
         calendar.set(Calendar.DAY_OF_MONTH, day);
         Date currentDate = calendar.getTime();
         String formattedDate = dateFormat.format(currentDate);
         return LocalDate.parse(formattedDate);
     }
 
-    public LocalDate lastDateOfCurrentMonth()
-    {
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year,month,day);
-        calendar.set(Calendar.DAY_OF_MONTH,calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        Date currentDate = calendar.getTime();
-        String formattedDate = dateFormat.format(currentDate);
-        return LocalDate.parse(formattedDate);
-    }
 }
