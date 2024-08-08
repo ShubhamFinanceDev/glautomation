@@ -43,7 +43,7 @@ public class GlService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Scheduled(cron = "0 0/1 * * * *")
+//    @Scheduled(cron = "0 0/1 * * * *")
     public void invokeProcessBySchedule() {
         try {
             LocalDate currentDate = calendar.currentDate();
@@ -108,7 +108,7 @@ public class GlService {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("MIS_Report");
         int rowCount = 0;
-        String[] header = {"VOUCHER_DTL_ID", "Voucher_Number", "Branch", "GL_Code", "DrCr_Flag", "Amount", "NARRATION", "Reference_Id", "Loan_Id", "Value_Date", "Voucher_Date", "Voucher_Creation_Date", "Product_Code", "Entity_ID", "SCHEME_CODE", "CUST_ID", "CUST_NAME", "PRODUCT_TYPE", "PRODUCT_NAME", "SANCTIONED_LOAN_AMOUNT", "CAS_APPLICATION_NUMBERt", "CHEQUE_NUMBER", "LOAN_BRANCH_STATE_CODE", "CUSTOMER_ADDRESS_STATE_CODE", "PAN"};
+        String[] header = {"Voucher_Number", "Branch", "GL_Code", "DrCr_Flag", "Amount", "NARRATION", "Reference_Id", "Loan_Id", "Value_Date", "Voucher_Date", "Voucher_Creation_Date", "Product_Code", "Entity_ID", "SCHEME_CODE", "CUST_ID", "CUST_NAME", "PRODUCT_TYPE", "PRODUCT_NAME", "SANCTIONED_LOAN_AMOUNT", "CAS_APPLICATION_NUMBERt", "CHEQUE_NUMBER", "LOAN_BRANCH_STATE_CODE", "CUSTOMER_ADDRESS_STATE_CODE", "PAN"};
         Row headerRow = sheet.createRow(rowCount++);
         int cellCount = 0;
 
@@ -118,7 +118,7 @@ public class GlService {
         for (ReportModel readData : reportModels) {
             Row row = sheet.createRow(rowCount++);
             cellCount = 0;
-            row.createCell(cellCount++).setCellValue(readData.getVoucherDtlId());
+//            row.createCell(cellCount++).setCellValue(readData.getVoucherDtlId());
             row.createCell(cellCount++).setCellValue(readData.getVoucherNumber());
             row.createCell(cellCount++).setCellValue(readData.getBranch());
             row.createCell(cellCount++).setCellValue(readData.getGlCode());
