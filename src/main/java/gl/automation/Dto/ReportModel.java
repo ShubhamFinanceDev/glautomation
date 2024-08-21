@@ -2,6 +2,8 @@ package gl.automation.Dto;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class ReportModel {
     private String voucherDtlId;
@@ -13,9 +15,9 @@ public class ReportModel {
     private String narration;
     private String referenceId;
     private String loanId;
-    private String valueDate;
-    private String voucherDate;
-    private String voucherCreationDate;
+    private Date valueDate;
+    private Date voucherDate;
+    private Date voucherCreationDate;
     private String productCode;
     private String entityId;
     private String schemeCode;

@@ -2,7 +2,6 @@ package gl.automation.Utility;
 
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
@@ -44,4 +43,8 @@ public class CalendarUtility {
         return LocalDate.parse(formattedDate);
     }
 
+    public String timestampToDate(Date timestamp) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yy");
+        return formatter.format(timestamp);
+    }
 }

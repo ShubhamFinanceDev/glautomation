@@ -118,6 +118,7 @@ public class GlService {
         for (ReportModel readData : reportModels) {
             Row row = sheet.createRow(rowCount++);
             cellCount = 0;
+
 //            row.createCell(cellCount++).setCellValue(readData.getVoucherDtlId());
             row.createCell(cellCount++).setCellValue(readData.getVoucherNumber());
             row.createCell(cellCount++).setCellValue(readData.getBranch());
@@ -127,9 +128,9 @@ public class GlService {
             row.createCell(cellCount++).setCellValue(readData.getNarration());
             row.createCell(cellCount++).setCellValue(readData.getReferenceId());
             row.createCell(cellCount++).setCellValue(readData.getLoanId());
-            row.createCell(cellCount++).setCellValue(readData.getValueDate());
-            row.createCell(cellCount++).setCellValue(readData.getVoucherDate());
-            row.createCell(cellCount++).setCellValue(readData.getVoucherCreationDate());
+            row.createCell(cellCount++).setCellValue(calendar.timestampToDate(readData.getValueDate()));
+            row.createCell(cellCount++).setCellValue(calendar.timestampToDate(readData.getVoucherDate()));
+            row.createCell(cellCount++).setCellValue(calendar.timestampToDate(readData.getVoucherCreationDate()));
             row.createCell(cellCount++).setCellValue(readData.getProductCode());
             row.createCell(cellCount++).setCellValue(readData.getEntityId());
             row.createCell(cellCount++).setCellValue(readData.getSchemeCode());
