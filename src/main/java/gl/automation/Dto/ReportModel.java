@@ -25,7 +25,7 @@ public class ReportModel {
     private String custName;
     private String productType;
     private String productName;
-    private String sanctionLoanAmount;
+    private String sanctionedLoanAmount;
     private String casApplicationNumber;
     private String chequeNumber;
     private String loanBranchStateCode;

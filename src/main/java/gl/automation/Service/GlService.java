@@ -138,7 +138,7 @@ public class GlService {
             row.createCell(cellCount++).setCellValue(readData.getCustName());
             row.createCell(cellCount++).setCellValue(readData.getProductType());
             row.createCell(cellCount++).setCellValue(readData.getProductName());
-            row.createCell(cellCount++).setCellValue(readData.getSanctionLoanAmount());
+            row.createCell(cellCount++).setCellValue(readData.getSanctionedLoanAmount());
             row.createCell(cellCount++).setCellValue(readData.getCasApplicationNumber());
             row.createCell(cellCount++).setCellValue(readData.getChequeNumber());
             row.createCell(cellCount++).setCellValue(readData.getLoanBranchStateCode());
