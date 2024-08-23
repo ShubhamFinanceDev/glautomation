@@ -115,6 +115,7 @@ public class GlService {
         for (String headerValue : header) {
             headerRow.createCell(cellCount++).setCellValue(headerValue);
         }
+        System.out.println(reportModels.get(1));
         for (ReportModel readData : reportModels) {
             Row row = sheet.createRow(rowCount++);
             cellCount = 0;
@@ -123,7 +124,7 @@ public class GlService {
             row.createCell(cellCount++).setCellValue(readData.getVoucherNumber());
             row.createCell(cellCount++).setCellValue(readData.getBranch());
             row.createCell(cellCount++).setCellValue(readData.getGlCode());
-            row.createCell(cellCount++).setCellValue(readData.getDrCrFlag());
+            row.createCell(cellCount++).setCellValue(readData.getDrcrFlag());
             row.createCell(cellCount++).setCellValue(readData.getAmount());
             row.createCell(cellCount++).setCellValue(readData.getNarration());
             row.createCell(cellCount++).setCellValue(readData.getReferenceId());

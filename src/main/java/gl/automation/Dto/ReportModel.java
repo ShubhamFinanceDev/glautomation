@@ -10,7 +10,7 @@ public class ReportModel {
     private String voucherNumber;
     private String branch;
     private String glCode;
-    private String drCrFlag;
+    private String drcrFlag;
     private String amount;
     private String narration;
     private String referenceId;
