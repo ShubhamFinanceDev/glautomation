@@ -84,7 +84,7 @@ public class GlService {
             reportModels= readData(processDate);
             if(!reportModels.isEmpty()){
             byte[] file = generateFile(fileName, reportModels);  //generateFileLocally
-            uploadFileIntoStorage(fileName, file);
+           // uploadFileIntoStorage(fileName, file);
                 glAutomationUtility.sendMail(fileName, file);
             }
             else {

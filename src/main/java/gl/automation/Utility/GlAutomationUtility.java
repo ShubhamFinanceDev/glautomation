@@ -8,6 +8,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -23,6 +24,8 @@ public class GlAutomationUtility {
     private JavaMailSender javaMailSender;
     @Value("${spring.mail.username}")
     private String sender;
+
+    @Async
     public void sendMail(String fileName, byte[] file) {
 
         try {
@@ -32,7 +35,7 @@ public class GlAutomationUtility {
             emailList.add("naresh.chand@shubham.co");
             emailList.add("ravi.soni@shubham.co");
             emailList.add("Preeti.09721@shubham.co");
-            emailList.add("kumar.saurabh@dbalounge.com");
+            emailList.add("abhishek.sharma@dbalounge.com");
 
             emailList.forEach(sendMail->{
                 try {
