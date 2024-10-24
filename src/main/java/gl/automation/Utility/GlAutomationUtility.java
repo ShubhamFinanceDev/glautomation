@@ -29,9 +29,9 @@ public class GlAutomationUtility {
             String successMsg = "Dear Sir/Madam,\n\nI would like to inform you that the GL Automation has been completed successfully at " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) + "\nPlease find the attached document for your reference. \n\n\nRegards,\nIT Support.";
 
             List<String> emailList = new ArrayList<>();
-//            emailList.add("naresh.chand@shubham.co");
-//            emailList.add("ravi.soni@shubham.co");
-//            emailList.add("Preeti.09721@shubham.co");
+            emailList.add("naresh.chand@shubham.co");
+            emailList.add("ravi.soni@shubham.co");
+            emailList.add("Preeti.09721@shubham.co");
             emailList.add("kumar.saurabh@dbalounge.com");
 
             emailList.forEach(sendMail->{
@@ -44,12 +44,6 @@ public class GlAutomationUtility {
                     helper.setSubject("GL Automation notification");
                     InputStreamSource attachmentSource = new ByteArrayResource(file);
                     helper.addAttachment(fileName,attachmentSource);
-
-//                    File excelFile = new File(Arrays.toString(file), fileName);
-//                    if (excelFile.exists()) {
-//                    } else {
-//                        logger.warn("Excel file not found: {}", excelFile.getAbsolutePath());
-//                    }
 
                     javaMailSender.send(message);
                     System.out.println("Mail sent successfully to: " + sendMail);
