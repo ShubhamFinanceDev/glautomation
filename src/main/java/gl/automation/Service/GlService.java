@@ -3,6 +3,7 @@ package gl.automation.Service;
 import gl.automation.Configuration.BlobStorageService;
 import gl.automation.Dto.ReportModel;
 import gl.automation.Utility.CalendarUtility;
+import gl.automation.Utility.GlAutomationUtility;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -42,6 +43,8 @@ public class GlService {
     private CalendarUtility calendar;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private GlAutomationUtility glAutomationUtility;
 
     @Scheduled(cron = "0 0 10 * * *")
     public void invokeProcessBySchedule() {
@@ -74,7 +77,7 @@ public class GlService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMMYYYY");
         String formattedDate = processDate.format(formatter);
 
-        String fileName = "Handsoff " + formattedDate + ".xlsx";
+        String fileName = "HandsoffUAT " + formattedDate + ".xlsx";
         List<ReportModel> reportModels = new ArrayList<>();
         try {
 
@@ -82,6 +85,7 @@ public class GlService {
             if(!reportModels.isEmpty()){
             byte[] file = generateFile(fileName, reportModels);  //generateFileLocally
             uploadFileIntoStorage(fileName, file);
+                glAutomationUtility.sendMail(fileName, file);
             }
             else {
                 logger.info("Records not available to write in file");
