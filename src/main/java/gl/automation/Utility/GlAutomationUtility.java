@@ -25,7 +25,7 @@ public class GlAutomationUtility {
     @Value("${spring.mail.username}")
     private String sender;
 
-    @Async
+
     public void sendMail(String fileName, byte[] file) {
 
         try {
